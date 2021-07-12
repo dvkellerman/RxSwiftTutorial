@@ -5,11 +5,12 @@ import RxSwift
 import PlaygroundSupport
 
 /** `ЗМІСТ`
- - Вступ до Rx
- - Базові поняття
- - Створення спостережуваних послідовностей ( Observable sequences або просто Observable)
- - Патерни при побудові UI
- - Архітектурні */
+ - `Вступ до Rx`
+ - `Базові поняття`
+ - `Використання Observable`
+ - `Rx оператори`
+ - `Rx та побудова UI`
+ - `Rx та MVVM` */
 
 /** `Вступ до Rx` */
 /** - `Rx` - Це поєднання найкращих ідей із шаблону `Observer`, шаблону `Iterator` та `функціонального програмування`.
@@ -102,7 +103,8 @@ Observable<String>.create { observer in
     observer.onNext("A")
     observer.onNext("B")
     observer.onCompleted()
-    observer.onNext("C") // Цей елемент не буде надісланим тому що вище вже був надісланий  completed
+/** `Цей елемент не буде надісланим тому що вище вже був надісланий `completed` */
+    observer.onNext("C")
     return Disposables.create()
 }.subscribe(onNext: { (value) in
     print(value)
@@ -113,3 +115,26 @@ Observable<String>.create { observer in
 }) {
     print("onDisposed")
 }.disposed(by: disposeBag)
+
+
+/** `Використання Observable` */
+let apiKey  = "04caf053efeb41d3abe73156210907"
+let city    = "London"
+urlString   = "http://api.weatherapi.com/v1/current.json?key=\(apiKey)&q=\(city)&aqi=no"
+url         = URL(string: urlString)!
+let request = URLRequest(url:url)
+URLSession.shared
+    .rx.response(request:request)
+    .subscribe(onNext: { response in
+        
+    },
+    onError: { error in
+        
+    })
+
+
+/** `Rx оператори` */
+
+/** `Патерни при побудові UI` */
+
+/** `Rx та MVVM` */
