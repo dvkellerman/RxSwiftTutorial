@@ -17,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2B41654E269C6281000B2CEB /* Rx.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Rx.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		2BB7102D269C5AD000BC6818 /* RxSwiftTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxSwiftTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BB71030269C5AD000BC6818 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2BB71032269C5AD000BC6818 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -50,6 +51,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		2B41654F269C628C000B2CEB /* Playgrounds */ = {
+			isa = PBXGroup;
+			children = (
+				2B41654E269C6281000B2CEB /* Rx.playground */,
+			);
+			path = Playgrounds;
+			sourceTree = "<group>";
+		};
 		2BB71024269C5AD000BC6818 = {
 			isa = PBXGroup;
 			children = (
@@ -73,6 +82,7 @@
 			children = (
 				2BB71044269C5ADD00BC6818 /* App */,
 				2BB71045269C5AE400BC6818 /* Screens */,
+				2B41654F269C628C000B2CEB /* Playgrounds */,
 				2BB71049269C5FF900BC6818 /* Extension */,
 				2BB71048269C5FED00BC6818 /* Resources */,
 			);
