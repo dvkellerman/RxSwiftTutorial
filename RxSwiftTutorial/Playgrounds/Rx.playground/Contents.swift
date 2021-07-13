@@ -2,12 +2,13 @@
   
 import UIKit
 import RxSwift
+import RxCocoa
 import PlaygroundSupport
 
 /** `ЗМІСТ`
  - `Вступ до Rx`
  - `Базові поняття`
- - `Використання Observable`
+ - `Приклади Observable`
  - `Rx оператори`
  - `Rx та побудова UI`
  - `Rx та MVVM` */
@@ -22,7 +23,12 @@ import PlaygroundSupport
   - https://habr.com/ru/post/281292/ - шпагалка по оперторам */
 
 /** `Базові поняття` */
+/** Трохи англійської
+  `Observable`               - цей обєкт що спостерігається
+  `Observer`, `Subscriber`   - цей обєкт що спостерігає за `Observable`
+  `Observable Sequence`      - Спостережувана послідовність, на практиці синонім `Observable`.  Деколи краще передає саму ідею послідовнсті подій. */
 /**
+
  1. Серцем `RxSwift` фреймворка є обєкт `Observable`, який представляє собою послідловність.
  2. `Observable` - це послідовність даних або подій на які можна підписатися  (`Subscribe`) а також розжиряти застосовуючи різні `Rx` оператори `map`, `filter`,  `flatMap`.
  3. `Observable` може надсилати дані асинхронно
@@ -89,7 +95,7 @@ observable4.subscribe { value in
 
 /** Приклад із  викликом `dispose()` */
 let observable1 = Observable.of([1,2,3,4],[11,22,33,44])
-let subscribeObservable = observable1.subscribe{ event in
+let subscribeObservable = observable1.subscribe { event in
     print("Event \(event)")
     if let element = event.element {
         print("Element is \(element)")
@@ -117,24 +123,115 @@ Observable<String>.create { observer in
 }.disposed(by: disposeBag)
 
 
-/** `Використання Observable` */
+/** `Приклади Observable` */
+
+/** `Manual Creation` */
+let mobileDevs: Observable<String> = Observable.create { observer in
+    observer.onNext("Anton")
+    observer.onNext("Eugenie")
+    observer.onNext("Dima")
+    observer.onNext("Vitali")
+    observer.onCompleted()
+    // We don't need to free any memory here, so we just return Disposables.create()
+    return Disposables.create()
+}
+// робимо підписку
+mobileDevs
+    .subscribe { name in
+        print(name)
+    }
+    .disposed(by: disposeBag)
+
+/** `UIButton` */
+let loginButton = UIButton(frame: .zero)
+loginButton.rx.tap
+    .subscribe(onNext: {
+        print("Login button clicked!")
+        // call login service
+    })
+    .disposed(by:disposeBag)
+
+/** `UITextFiled` */
+let emailTextField = UITextField(frame: .zero)
+emailTextField.rx.text.orEmpty
+    .subscribe { email in
+        print("User email: \(email)")
+    }
+    .disposed(by:disposeBag)
+
+/** `UISegementedControl*/
+let switcher = UISegmentedControl(frame: .zero)
+switcher.rx.controlEvent(.valueChanged)
+        .subscribe { selectedSegment in
+           print("\(selectedSegment)")
+        }
+        .disposed(by: disposeBag)
+
+/** `NotificationCenter` */
+NotificationCenter.default.rx
+    .notification(UIApplication.didEnterBackgroundNotification)
+    .subscribe(on: MainScheduler.instance) // receive event on Main thread
+    .subscribe( onNext: {notification in
+        print("Aplication did enter background")
+        print("Stop UI related work...")
+    })
+    .disposed(by: disposeBag)
+
+/** URLSession */
 let apiKey  = "04caf053efeb41d3abe73156210907"
 let city    = "London"
 urlString   = "http://api.weatherapi.com/v1/current.json?key=\(apiKey)&q=\(city)&aqi=no"
 url         = URL(string: urlString)!
 let request = URLRequest(url:url)
-URLSession.shared
-    .rx.response(request:request)
+URLSession.shared.rx
+    .json(request: request)
+    .map { json -> [String:Any] in
+        return json as! [String:Any]
+    }
+    .catch { error in
+        return .just([String:Any]())
+    }
     .subscribe(onNext: { response in
-        
-    },
-    onError: { error in
-        
+        print(response)
     })
+    .disposed(by: disposeBag)
+
+/** Advanced Manual Creation */
+let asyncComputation: Observable<Data> = Observable.create { observer in
+    let url = URL(string: "https://upload.wikimedia.org/wikipedia/en/4/46/Bnei_Baruch.png")!
+    let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        if let data = data {
+            observer.onNext(data)
+        } else { // pass empty data in case of error
+            observer.onNext(Data())
+        }
+    }
+    task.resume()
+    // NOTE: the dispose action! We are canceling the task if this Observable Sequence gets deallocated
+    // Also in here you can: close DB or do any other memory release stuff
+    return Disposables.create {
+        task.cancel()
+    }
+}
+let imageView = UIImageView(frame: .zero)
+asyncComputation
+    .subscribe(on: MainScheduler.instance)
+    .subscribe(onNext: { [weak imageView] data in
+        let image        = UIImage(data: data)!
+        imageView?.image = image
+        // .. ітд ітп
+    })
+    .disposed(by: disposeBag)
 
 
-/** `Rx оператори` */
+/** `Rx оператори`
+`Такі оператори як  map та catchErro вже були наведені нижче`
+ 
+/* */
+https://habr.com/ru/post/281292/ */
 
 /** `Патерни при побудові UI` */
 
 /** `Rx та MVVM` */
+
+
